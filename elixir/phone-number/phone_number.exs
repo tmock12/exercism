@@ -23,7 +23,7 @@ defmodule Phone do
     |> normalize_number
   end
 
-  def normalize_number(string) when byte_size(string) == 10, do: string
+  def normalize_number(<<string::bytes-size(10)>>), do: string
   def normalize_number("1" <> string), do: normalize_number(string)
   def normalize_number(_), do: "0000000000"
 
@@ -70,10 +70,11 @@ defmodule Phone do
   """
   @spec pretty(String.t) :: String.t
   def pretty(raw) do
-    [area_code, first_three, last_four] =
-      raw
-      |> number
-      |> String.split(~r/(\d){3}()(\d){3}()(\d){4}/, on: [2,4])
+    <<
+      area_code::bytes-size(3),
+      first_three::bytes-size(3),
+      last_four::bytes-size(4)
+    >> = number(raw)
     "(#{area_code}) #{first_three}-#{last_four}"
   end
 end
